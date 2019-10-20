@@ -7,20 +7,20 @@ class TriviaQuestion {
 let questions = {
      questionOne : new TriviaQuestion (
         `Who wrote "crazy in love?"`,
-        `Beyonce`,
-        ["Rhianna", "Iggy Pop", "Foo Fighters"],
+        `4`,
+        ["1", "2", "3"],
         "./assets/img/beyonce.webp"
     ),
     questionTwo : new TriviaQuestion (
         `Who wrote "Tub Thumper?"`,
-        `Chumba Wumba`,
-        ["Christina Agulara", "Beyonce", "Foo Fighters"],
+        `9`,
+        ["6", "7", "8"],
         "./assets/img/beyonce.webp"
     ),
     questionThree : new TriviaQuestion (
-        `Who wrote "Tub Thumper?"`,
-        `Chumba Wumba`,
-        ["Christina Agulara", "Beyonce", "Foo Fighters"],
+        `Who wrote "I like big butts and i cannot lie?"`,
+        `13`,
+        ["10", "11", "12"],
         "./assets/img/beyonce.webp"
     ),
     
@@ -28,16 +28,33 @@ let questions = {
 
 
 //functions
+function random (value) { 
+    return Math.floor(Math.random() * value)
+};
+
 function initialize () {
-    let keyArr = Object.keys(questions);
-    let randomIdx = Math.floor(Math.random() * keyArr.length);
+    let objArr = Object.values(questions);
+    let randomIdx = random(objArr.length);
+    let [question, correct, incorrectArr, img] = Object.values(objArr[randomIdx]);
 
+    incorrectArr.push(correct);
+
+    for (let i = 0; i < 3; i++) {
+        if (random(100) < 50)  {
+            let temp = incorrectArr[i+1]
+            incorrectArr[i+1] = incorrectArr[i];
+            incorrectArr[i] = temp;
+        }
+    }
     
-    console.log(randomIdx)
-    console.log(Object.keys(questions));
 
+    let html = `<ul>`;
+    incorrectArr.map(function(choice) {
+        html += `<li>${choice}</li>`
+    });
 
-
+    $("#question").html(question);
+    $("#multiple-choice").html(html + "</ul>")
 };
 
 
