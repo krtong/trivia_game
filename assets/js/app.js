@@ -1,15 +1,10 @@
 class TriviaQuestion {
-    constructor(question, correct, incorrectArr, img) {
-        Object.assign(this, {
-            question,
-            correct,
-            incorrectArr,
-            img
-        })
+    constructor(question, correctAnswer, multipleChoices, img) {
+        Object.assign(this, {question, correctAnswer, multipleChoices, img})
     }
 }
 
-let questions = {
+const questions = {
     questionOne: new TriviaQuestion(
         `Who wrote "crazy in love?"`,
         `Beyonce`,
@@ -32,52 +27,55 @@ let questions = {
 
 //functions
 function initialize() {
-    let timesUp = false;
-    let objArr = Object.values(questions); //randomizes the question
-    let randomIdx = Math.floor(Math.random() * objArr.length);
-    let [question, correct, arr, img] = Object.values(objArr[randomIdx]);
+    const objArr = Object.values(questions); //randomizes the question
+    const randomIdx = Math.floor(Math.random() * objArr.length);
+    const [question, correct, arr, img] = Object.values(objArr[randomIdx]);
     let intervalId;
-    let html = `<ul>`;
+    let timesUp = false;
 
-    //this section is for populating the page with multiple choice answers. 
-    arr = arr.sort((a, b) => Math.random() > 0.5 ? 1 : -1);
-    arr.map(choice => html += `<li class="choice">${choice}</li>`);
-
+    function populateMultiChoice() {
+        const randomizedArr = arr.sort(() => Math.random() > 0.5 ? 1 : -1);
+        let html = `<ul>`;
+        randomizedArr.map(choice => html += `<li class="choice">${choice}</li>`);
+        html += `</ul>`
+        return html;
+    };
+    
     function isCorrect() {
         let message;
-        if (timesUp) message = [`Time's up.`, `The answer was ${correct}.`]
+        if (timesUp) message = [`Time's up.`, `The correct answer was ${correct}.`]
         else if ($(this).html() === correct) message = [`Correct!`, ``]
-        else message = [`Incorrect!`, `The answer was ${correct}.`];
-        let html = `<div>
-                        <div><h1>${message[0]}</h1></div>
-                        <div>${message[1]}</div>
+        else message = [`Incorrect!`, `The correct answer was ${correct}.`];
+        const [h1, correctAnswer] = message;
+        const html = () => `<div>
+                        <div><h1>${h1}</h1></div>
+                        <div>${correctAnswer}</div>
                         <img src="./assets/img/${img}">
                     </div> `;
         $("#multiple-choice").empty()
         $("#timer").empty();
         $("#question").html(html);
         clearInterval(intervalId)
-        setTimeout(initialize, 5000);
+        setTimeout(initialize, 3000);
     };
-
     //this section is for creating the timer. 
-    function run(number) {
+    function run(timer) {
+        const html = () => `<h5>${timer}</h5>`;
         clearInterval(intervalId);
-        $("#timer").html("<h2>" + number + "</h2>");
+        $("#timer").html(html);
         intervalId = setInterval(function () {
-            number--;
-            $("#timer").html(`<h5>${number}</h5>`);
-            if (number === 0) {
+            timer--;
+            $("#timer").html(html);
+            if (timer === 0) {
                 timesUp = true;
                 clearInterval(intervalId);
                 isCorrect();
             }
         }, 1000);
     };
-    
     run(10);
     $("#question").html(question);
-    $("#multiple-choice").html(`${html}</ul>`)
+    $("#multiple-choice").html(populateMultiChoice)
     $(".choice").click(isCorrect)
 };
 
